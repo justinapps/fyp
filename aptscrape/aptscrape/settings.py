@@ -38,7 +38,26 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    #allauth stuff
+    #django sites framework is required
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
 ]
+
+SITE_ID = 1
+EMAIL_BACKEND='django.core.mail.backends.console.EmailBackend'
+
+# Custom allauth settings
+# Use email as the primary identifier
+ACCOUNT_AUTHENTICATION_METHOD = 'email' 
+ACCOUNT_EMAIL_REQUIRED = True
+# Make email verification mandatory to avoid junk email accounts
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory' 
+# Eliminate need to provide username, as it's a very old practice
+ACCOUNT_USERNAME_REQUIRED = False
 
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
@@ -81,6 +100,16 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
+
+
+#'allauth' backend to AUTHENTICATION_BACKEND and do not remove ModelBackend
+AUTHENTICATION_BACKENDS = (
+    # Needed to login by username in Django admin and to ensure compatibility with other packages
+    'django.contrib.auth.backends.ModelBackend',
+    # 'allauth' specific authentication methods
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
 
 
 # Password validation

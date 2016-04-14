@@ -21,5 +21,6 @@ urlpatterns = [
 	#admin site docs app
 	url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', admin.site.urls),
+    url(r'^accounts/', include('allauth.urls')),
 
 ]
