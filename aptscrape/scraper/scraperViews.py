@@ -22,8 +22,6 @@ import string
 #Only doing myhome for testing purposes, will implement other
 #websites later.
 
-#apt_params = ListingParams #shit from the user form comes here
-
 def toDictionary(request):
 	minprice = request.POST.get('minprice', '')
 	maxprice = request.POST.get('maxprice', '')
@@ -48,6 +46,7 @@ def accept_form(request):
 		form = apt_params(data=request.POST)
 		if form.is_valid():
 			paramD = toDictionary(request)
+			myhome_crawler(paramD)
 
 		else:
 			print("Form errors occured in scraper.scrapeViews.py: ")
@@ -56,37 +55,30 @@ def accept_form(request):
 
 			return redirect('scraper')
 
-	if len(paramD) == 0:
-		print()
-	#apt_dict = {k:v for k, v in form.__dict__.items() if not (k.startswith('__')
-	#	and k.endswith('__'))}
+	#if len(paramD) == 0:
+	#	print()
 
-	print("before")
-	#return apt_dict
 	print(paramD)
+	paramD = dict()
 
-	#print(apt_params)
-	print("we here fam before final return statement")
 	return render(request, 'scraper/scraper.html', {
 		'form': apt_params,
 		})
 
 
 
-"""
-def myhome_crawler(request):
+
+def myhome_crawler(paramD):
 
 	__count = 0
 	__page_num = 1
 
-	while __page_num != 3:
+	while __page_num != 2:
 
-		url_base =
-			'http://www.myhome.ie/rentals/dublin/property-to-rent?format=rss'
-			+ '&page=' + str(__page_num)
-		resp = requests.get(url_base, params = params)
+		url_base = 'http://www.myhome.ie/rentals/dublin/property-to-rent?format=rss' + '&page=' + str(__page_num)
+		resp = requests.get(url_base, params = paramD)
 		#print ("the value of the url is {}".format(url_base))
-		#print(resp.url)
+		print(resp.url)
 		html = bs4(resp.text, 'html.parser')
 		apts = html.findAll('item')
 		print('Number of listings on page: ' + str(len(apts)))
@@ -100,7 +92,7 @@ def myhome_crawler(request):
 
 			__count = __count + 1
 
-			#print( '('+ str(__count) +'.) ' + title + '\n' + link + '\n' + price + '\n' + n_brs + '\n')
+			print( '('+ str(__count) +'.) ' + title + '\n' + link + '\n' + price + '\n' + n_brs + '\n')
 
 		__page_num = __page_num + 1
 		#print(resp.url)
@@ -109,4 +101,3 @@ def myhome_crawler(request):
 
 		print("myhome shit ran")
 
-"""
