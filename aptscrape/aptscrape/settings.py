@@ -14,6 +14,7 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+LOGIN_URL ='/'
 
 
 # Quick-start development settings - unsuitable for production
@@ -38,13 +39,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'contact',
+    'scraper',
+    #'south',
 
     #allauth stuff
     #django sites framework is required
     'django.contrib.sites',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
+
+    
+    #'allauth',
+    #'allauth.account',
+    #'allauth.socialaccount',
+    
 ]
 
 SITE_ID = 1
@@ -113,7 +120,7 @@ AUTHENTICATION_BACKENDS = (
     # Needed to login by username in Django admin and to ensure compatibility with other packages
     'django.contrib.auth.backends.ModelBackend',
     # 'allauth' specific authentication methods
-    'allauth.account.auth_backends.AuthenticationBackend',
+    #'allauth.account.auth_backends.AuthenticationBackend',
 )
 
 

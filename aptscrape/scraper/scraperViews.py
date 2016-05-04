@@ -5,12 +5,16 @@ then put into a Python dict so that they can be used by the
 Requests module to create a URL to scrape from.
 """
 #Imports for form management
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
 from .scraperParams import ListingParams
 from django.template.loader import get_template
 from django.template import Context
-from django.shortcuts import redirect
+
+#need these for registration, login, logout
+#from django.contrib.auth.models import User
+#from scraper.scraperParams import AuthenticateForm, UserCreateForm, ListingParams
+#from django.contrib.auth import login, authenticate, logout
 
 #Imports for scraping
 import pandas as pd
@@ -19,85 +23,163 @@ from bs4 import BeautifulSoup as bs4
 import numpy as np
 import string
 
-#Only doing myhome for testing purposes, will implement other
+#Only doing myhome and cg for testing purposes, will implement other
 #websites later.
 
 def toDictionary(request):
-	minprice = request.POST.get('minprice', '')
-	maxprice = request.POST.get('maxprice', '')
-	bedrooms = request.POST.get('bedrooms', '')
-	#is_furnished = request.POST.get('is_furnished', '')
-	
-	#myhome dictionary		
-	return dict(minprice = minprice,
-				maxprice = maxprice,
-				bedrooms = bedrooms,
-				)
+    #city = request.POST.get('city', '')
+    minprice = request.POST.get('minprice', '')
+    maxprice = request.POST.get('maxprice', '')
+    bedrooms = request.POST.get('bedrooms', '')
+    #is_furnished = request.POST.get('is_furnished', '')
+    
+    #myhome dictionary      
+    return dict(minprice = minprice,
+                maxprice = maxprice,
+                bedrooms = bedrooms,
+                )
 
-	#cg dictionary will go here
+    #cg dictionary will go here
 
 
 def accept_form(request):
 
-	apt_params = ListingParams #shit from the user form comes here
+    apt_params = ListingParams #shit from the user form comes here
 
-	paramD = dict()
-	if request.method == 'POST':
-		form = apt_params(data=request.POST)
-		if form.is_valid():
-			paramD = toDictionary(request)
-			myhome_crawler(paramD)
+    paramD = dict()
+    city = ''
+    if request.method == 'POST':
+        form = apt_params(data=request.POST)
+        if form.is_valid():
+            form.save()
+            city = request.POST.get('city', '').lower()
+            paramD = toDictionary(request)
+            cgParamD = dict(
+                min_price = paramD['minprice'],
+                max_price = paramD['maxprice'],
+                bedrooms = paramD['bedrooms'],
+                #is_furnished = furnished,
+                )
 
-		else:
-			print("Form errors occured in scraper.scrapeViews.py: ")
-			print(form.errors)
-			
+            myhome_crawler(paramD, city)
+            cg_crawler(cgParamD, city)
 
-			return redirect('scraper')
+        else:
+            print("Form errors occured in scraper.scrapeViews.py: ")
+            print(form.errors)
+            
 
-	#if len(paramD) == 0:
-	#	print()
+            return redirect('scraper')
 
-	print(paramD)
-	paramD = dict()
+    #if len(paramD) == 0:
+    #   print()
 
-	return render(request, 'scraper/scraper.html', {
-		'form': apt_params,
-		})
+    print(paramD)
+    #paramD = dict()
+
+    return render(request, 'scraper/scraper.html', {
+        'form': apt_params,
+        })
 
 
+def myhome_crawler(paramD, city):
+
+    count = 0
+    page_num = 1
+
+    while page_num != 2:
+
+        url_base = 'http://www.myhome.ie/rentals/' + city + '/property-to-rent?format=rss' + '&page=' + str(page_num)
+        resp = requests.get(url_base, params = paramD)
+        #print ("the value of the url is {}".format(url_base))
+        print(resp.url)
+        html = bs4(resp.text, 'html.parser')
+        apts = html.findAll('item')
+        print('Number of listings on page: ' + str(len(apts)))
+
+        for apt in apts:
+
+            title = apt.find_all('title')[0].text.split(' - ')[0]
+            link = apt.find_all('link')[0].text
+            price = apt.find_all('price')[0].text.strip('€') #.strip(' / month')
+            n_brs = apt.find_all('bedrooms')[0].text.strip(' Bed')
+
+            count = count + 1
+
+            #print( '('+ str(count) +'.) ' + title + '\n' + link + '\n' + price + '\n' + n_brs + '\n')
+
+        page_num = page_num + 1
+        #print(resp.url)
+
+        print("myhome shit ran")
 
 
-def myhome_crawler(paramD):
+def find_prices(apartments):
 
-	__count = 0
-	__page_num = 1
+    prices = []
+    for rw in apartments:
+        price = rw.find('span', {'class': 'price'})
+        if price is not None:
+            price = float(price.text.strip('â‚¬').strip('�').strip('$').strip('€').strip('£'))
+        else:
+            price = np.nan
+        prices.append(price)
+    return prices
 
-	while __page_num != 2:
 
-		url_base = 'http://www.myhome.ie/rentals/dublin/property-to-rent?format=rss' + '&page=' + str(__page_num)
-		resp = requests.get(url_base, params = paramD)
-		#print ("the value of the url is {}".format(url_base))
-		print(resp.url)
-		html = bs4(resp.text, 'html.parser')
-		apts = html.findAll('item')
-		print('Number of listings on page: ' + str(len(apts)))
+def cg_crawler(cgParamD, city):
 
-		for apt in apts:
+    #while True:
+    count = 0
+    listing_n = 0
+    results = []
 
-			title = apt.find_all('title')[0].text.split(' - ')[0]
-			link = apt.find_all('link')[0].text
-			price = apt.find_all('price')[0].text.strip('€') #.strip(' / month')
-			n_brs = apt.find_all('bedrooms')[0].text.strip(' Bed')
+    search_indices = np.arange(0, 400, 100)
 
-			__count = __count + 1
+    for i in search_indices:
 
-			print( '('+ str(__count) +'.) ' + title + '\n' + link + '\n' + price + '\n' + n_brs + '\n')
+        url = 'http://' + city + '.craigslist.org/search/apa'
+        cgParamD['s'] = str(count*100)
+        count = count + 1
 
-		__page_num = __page_num + 1
-		#print(resp.url)
+        resp = requests.get(url, params=cgParamD)
+        print(resp.url)
 
-		
+        txt = bs4(resp.text, 'html.parser')
+        apts = txt.findAll(attrs={'class': "row"})
 
-		print("myhome shit ran")
+        org_title = [rw.find('a', attrs={'class': 'hdrlnk'}).text for rw in apts]
 
+        #print(title)
+        links = [rw.find('a', attrs={'class': 'hdrlnk'})['href'] for rw in apts]
+        #print(links)
+        price = find_prices(apts)
+        #print("number of prices listed" +str(len(price)))
+        #print (price)
+
+
+        size_text = [rw.findAll(attrs={'class': 'housing'})[0].text for rw in apts]
+        #sizes_brs = [find_size_and_brs(stxt) for stxt in size_text]
+        #sizes, n_brs = zip(*sizes_brs)  # This unzips into 2 vectors, (tuples actually)
+
+        sizes = [rw.findAll(attrs={'class': 'housing'})[0].text.split(' - ')[1] for rw in apts]
+        #print(sizes)
+        n_brs = [rw.findAll(attrs={'class': 'housing'})[0].text.split(' - ')[0].replace('/ ', '') for rw in apts]
+        #print(n_brs)
+
+        data = np.array([price, sizes, n_brs, org_title, links])
+        col_names = ['price', 'size', 'brs', 'org_title', 'link']
+        df = pd.DataFrame(data.T, columns=col_names)
+        #df = df.set_index('time')
+
+        results.append(df)
+
+    results = pd.concat(results, axis=0)
+
+    use_chars = string.ascii_letters +\
+        ''.join([str(i) for i in range(10)]) +\
+        ' /\.'
+    results['org_title'] = results['org_title'].apply(
+        lambda a: ''.join([i for i in a if i in use_chars]))
+
+    print("cg shit ran")

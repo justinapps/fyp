@@ -25,7 +25,13 @@ urlpatterns = [
 	#admin site docs app
 	url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', admin.site.urls),
-    url(r'^accounts/', include('allauth.urls')),
+    #url(r'^accounts/', include('allauth.urls')),
     url(r'^contact/$', contactViews.contact, name='contact'), #contact form
     url(r'^scraper/$', scraperViews.accept_form, name='scraper'),
+
+    url(r'^$', 'userauth.authViews.indexViews'),
+    url(r'^login$', 'userauth.authViews.loginViews'),
+    url(r'^logout$', 'userauth.authViews.logoutViews'),
+    url(r'^signup$', 'userauth.authViews.registerViews'),
+
 ]
