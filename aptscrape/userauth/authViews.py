@@ -9,14 +9,15 @@ from django.contrib.auth.models import User
 from userauth.forms import AuthenticateForm, UserCreateForm
 from django.contrib.auth import login, authenticate, logout
 
-def indexViews(request, auth_form=None, user_form=None):
+
+def indexViews(request, auth_form=None, user_form=None, search_form=None):
     # User is logged in
+    search_form = ListingParams()
     if request.user.is_authenticated():
-        search_form = ListingParams()
         user = request.user
  
         return render(request,
-            'home.html',
+            'tmp.html',
             {'search_form': search_form, 'user': user, 'next_url': '/', })
     else:
         # User is not logged in
@@ -26,7 +27,7 @@ def indexViews(request, auth_form=None, user_form=None):
         #need to sort out home.html
         return render(request,
                       'home.html',
-                      {'auth_form': auth_form, 'user_form': user_form, })
+                      {'auth_form': auth_form, 'user_form': user_form, 'search_form': search_form})
 
 
 def loginViews(request):

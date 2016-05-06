@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% load staticfiles %}
+
  
 {% block login %}
     <form action="/login" method="post">{% csrf_token %}
@@ -16,7 +18,7 @@
     {{ user_form.non_field_errors }}
 </div>
 {% endif %}
-<img src="{{ STATIC_URL}}gfx/frog.jpg">
+
 <div class="panel right">
     <h1>New to Pad Shark?</h1>
     <p>
