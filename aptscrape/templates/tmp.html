@@ -7,9 +7,9 @@
  
 {% block content %}
     <div class="panel right">
-        <h1>Search for a pad below</h1>
+        <h1>Hunt for a pad below</h1>
         <p>
-            <form action="/submit" method="post">
+            <form class="col s12" action="" method="post">
             {% for field in search_form %}{% csrf_token %}
             {{ field }}
             {% endfor %}
@@ -22,3 +22,8 @@
 
     </div>
 {% endblock %}
+
+        <div class="input-field col s6">
+          <input placeholder="Placeholder" id="first_name" type="text" class="validate">
+          <label for="first_name">First Name</label>
+        </div>

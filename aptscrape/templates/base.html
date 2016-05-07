@@ -9,19 +9,26 @@
     <script type="text/javascript" src="{% static 'materialize/bin/materialize.js' %}"></script></script>
 </head>
 <body>
-    <header>
-        <div class="wrapper">
-            <img src="{% static 'gfx/logo.png' %}" alt="logo" />
-            <span>Pad Shark</span>
-            {% block login %}
-            <a href="/">Home</a>
-            <a href="/users/{{ username }}">My Profile</a>
-            <form action="/logout">
+
+
+  <div class="navbar-fixed">
+    <nav>
+      <div class="nav-wrapper">
+        <img src="{% static 'gfx/logo.png' %}" alt="logo" />
+        {% block login %}
+        <ul class="right hide-on-med-and-down">
+          <li><a href="/">Home</a></li>
+          <li><a href="/users/{{ username }}">My Profile</a></li>
+          <li><form action="/logout">
                 <input type="submit" id="btnLogOut" value="Log Out">
-            </form>
+            </form></li>
             {% endblock %}
-        </div>
-    </header>
+        </ul>
+      </div>
+    </nav>
+  </div>
+
+
     <div id="content">
         <div class="wrapper">
             {% block flash %}
