@@ -36,4 +36,10 @@ urlpatterns = [
     url(r'^logout$', 'userauth.authViews.logoutViews'),
     url(r'^signup$', 'userauth.authViews.registerViews'),
 
+
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+#scraper.scraperViews.accept_form
+"""
+its making the form in iindexViews but thats it. its never calling the shit from scraperViews so need to fix that somehow.
+"""

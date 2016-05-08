@@ -3,6 +3,7 @@ from django.http import HttpResponseRedirect
 from scraper.scraperParams import ListingParams
 from django.template.loader import get_template
 from django.template import Context
+from scraper.scraperViews import toDictionary, accept_form, myhome_crawler, find_prices, cg_crawler
 
 #need these for registration, login, logout
 from django.contrib.auth.models import User
@@ -12,22 +13,31 @@ from django.contrib.auth import login, authenticate, logout
 
 def indexViews(request, auth_form=None, user_form=None, search_form=None):
     # User is logged in
-    search_form = ListingParams()
+    
     if request.user.is_authenticated():
         user = request.user
- 
-        return render(request,
-            'tmp.html',
-            {'search_form': search_form, 'user': user, 'next_url': '/', })
+        search_form = ListingParams(data=request.POST)
+        if request.method == 'POST':
+            
+            accept_form(request)
+
+            return render(request,
+                'tmp.html',
+                {'search_form': search_form, 'user': user, 'next_url': '/', })
+
+        #if request method not POST
+        else: 
+            return render(request,
+                'tmp.html',
+                {'search_form': search_form, 'user': user, 'next_url': '/', })
     else:
         # User is not logged in
         auth_form = auth_form or AuthenticateForm()
         user_form = user_form or UserCreateForm()
  
-        #need to sort out home.html
         return render(request,
                       'home.html',
-                      {'auth_form': auth_form, 'user_form': user_form, 'search_form': search_form})
+                      {'auth_form': auth_form, 'user_form': user_form})
 
 
 def loginViews(request):

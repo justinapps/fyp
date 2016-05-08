@@ -65,11 +65,11 @@ def accept_form(request):
             cg_crawler(cgParamD, city)
 
         else:
-            print("Form errors occured in scraper.scrapeViews.py: ")
+            print("Form errors occured in scraper.scrapeViews.py, most likely not a POST method: ")
             print(form.errors)
             
 
-            return redirect('scraper')
+            return redirect('/')
 
     #if len(paramD) == 0:
     #   print()
@@ -77,7 +77,7 @@ def accept_form(request):
     print(paramD)
     #paramD = dict()
 
-    return render(request, 'scraper/scraper.html', {
+    return render(request, 'tmp.html', {
         'form': apt_params,
         })
 
