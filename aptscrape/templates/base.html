@@ -4,6 +4,7 @@
     {% load staticfiles %}
     <link rel="stylesheet/less" href="{% static 'style.less' %}">
     <link type="text/css" rel="stylesheet" href="{% static 'materialize/bin/materialize.css' %}"  media="screen,projection"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="{% static 'less.js' %}"></script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
     <script type="text/javascript" src="{% static 'materialize/bin/materialize.js' %}"></script></script>
@@ -19,9 +20,7 @@
         <ul class="right hide-on-med-and-down">
           <li><a href="/">Home</a></li>
           <li><a href="/users/{{ username }}">My Profile</a></li>
-          <li><form action="/logout">
-                <input type="submit" id="btnLogOut" value="Log Out">
-            </form></li>
+          <li><a href="/logout">Log Out</a></li>
             {% endblock %}
         </ul>
       </div>

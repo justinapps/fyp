@@ -10,11 +10,12 @@
         <h1>Search for a pad below</h1>
         <p>
             <form action="" method="post">
-            {% for field in search_form %}{% csrf_token %}
-            {{ field }}
-            {% endfor %}
-            <input type="hidden" value="{{ next_url }}" name="next_url">
-            <input type="submit" value="Search">
+                {% for field in search_form %}{% csrf_token %}
+                {{ field }}
+                {% endfor %}
+                <input type="hidden" value="{{ next_url }}" name="next_url">
+                <button class="btn waves-effect waves-light" type="submit" name="action">Search</button>
+
             </form>
         </p>
     </div>
