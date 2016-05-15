@@ -11,19 +11,22 @@ from userauth.forms import AuthenticateForm, UserCreateForm
 from django.contrib.auth import login, authenticate, logout
 
 
-def indexViews(request, auth_form=None, user_form=None, search_form=None):
+def indexViews(request, auth_form=None, user_form=None, search_form=None, listings=None):
     # User is logged in
+    listings =''
     
     if request.user.is_authenticated():
         user = request.user
         search_form = ListingParams(data=request.POST)
+        
         if request.method == 'POST':
             
-            accept_form(request)
+            listings = accept_form(request)
+
 
             return render(request,
                 'tmp.html',
-                {'search_form': search_form, 'user': user, 'next_url': '/', })
+                {'search_form': search_form, 'user': user, 'listings': listings, 'next_url': '/', })
 
         #if request method not POST
         else: 

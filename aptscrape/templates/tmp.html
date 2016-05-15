@@ -21,5 +21,19 @@
     </div>
     <div class="panel left">
         <p>Search results will go here.</p>
+        <ul>
+
+            {% for list in listings %}
+                {% for apt in list %}
+
+                    <li><p>{{ apt }}</p></li>
+
+                {% endfor %}
+            {% endfor %}
+
+        </ul>
+
     </div>
 {% endblock %}
+
+<!-- <li><p>{{ items }}</p></li> -->

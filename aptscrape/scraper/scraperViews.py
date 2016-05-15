@@ -36,7 +36,7 @@ def toDictionary(request):
     #myhome dictionary      
     return dict(minprice = minprice,
                 maxprice = maxprice,
-                bedrooms = bedrooms,
+                maxbeds = bedrooms,
                 )
 
     #cg dictionary will go here
@@ -52,22 +52,24 @@ def accept_form(request):
         form = apt_params(data=request.POST)
         if form.is_valid():
             form.save()
+            form = ListingParams
             city = request.POST.get('city', '').lower()
             paramD = toDictionary(request)
             cgParamD = dict(
                 min_price = paramD['minprice'],
                 max_price = paramD['maxprice'],
-                bedrooms = paramD['bedrooms'],
+                bedrooms = paramD['maxbeds'],
                 #is_furnished = furnished,
                 )
 
-            myhome_crawler(paramD, city)
-            cg_crawler(cgParamD, city)
+            listings = myhome_crawler(paramD, city)
+            print(listings)
+            #cg_crawler(cgParamD, city)
+
 
         else:
             print("Form errors occured in scraper.scrapeViews.py, most likely not a POST method: ")
             print(form.errors)
-            
 
             return redirect('/')
 
@@ -77,15 +79,15 @@ def accept_form(request):
     print(paramD)
     #paramD = dict()
 
-    return render(request, 'tmp.html', {
-        'form': apt_params,
-        })
+    return listings
 
 
 def myhome_crawler(paramD, city):
 
     count = 0
     page_num = 1
+    apt_list = []
+    list_of_apts = [];
 
     while page_num != 2:
 
@@ -105,6 +107,10 @@ def myhome_crawler(paramD, city):
             n_brs = apt.find_all('bedrooms')[0].text.strip(' Bed')
 
             count = count + 1
+            apt_list = [title, link, price, n_brs]
+            #print("Apartment " + str(count) + ":")
+            #print(apt_list)
+            list_of_apts.append(apt_list)
 
             #print( '('+ str(count) +'.) ' + title + '\n' + link + '\n' + price + '\n' + n_brs + '\n')
 
@@ -112,6 +118,7 @@ def myhome_crawler(paramD, city):
         #print(resp.url)
 
         print("myhome shit ran")
+        return list_of_apts
 
 
 def find_prices(apartments):
