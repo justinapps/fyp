@@ -36,6 +36,9 @@ urlpatterns = [
     url(r'^logout$', 'userauth.authViews.logoutViews'),
     url(r'^signup$', 'userauth.authViews.registerViews'),
 
+    #user profiles
+    url(r'^users/$', 'userauth.authViews.users'),
+    url(r'^users/(?P<username>\w{0,30})/$', 'userauth.authViews.users'),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

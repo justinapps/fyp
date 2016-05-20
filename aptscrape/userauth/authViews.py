@@ -9,6 +9,13 @@ from scraper.scraperViews import toDictionary, accept_form, myhome_crawler, find
 from django.contrib.auth.models import User
 from userauth.forms import AuthenticateForm, UserCreateForm
 from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import login_required
+
+#need these for user profiles
+from django.db.models import Count
+from django.http import Http404
+
+from scraper.models import Listing
 
 
 def indexViews(request, auth_form=None, user_form=None, search_form=None, listings=None):
@@ -74,4 +81,27 @@ def registerViews(request):
         else:
             return indexViews(request, user_form=user_form)
     return redirect('/')
+
+
+def get_latest(user):
+    try:
+        return user.ribbit_set.order_by('-id')[0]
+    except IndexError:
+        return ""
+ 
+ 
+@login_required
+def users(request, username=""):
+    if username:
+        # Show a profile
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            raise Http404
+        listings = Listing.objects.filter(user=user.id)
+        if username == request.user.username:
+            # Self Profile or buddies' profile
+            return render(request, 'user.html', {'user': user, 'listings': listings, })
+        return render(request, 'user.html', {'user': user, 'listings': listings,})
+
 
