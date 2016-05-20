@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'contact',
     'scraper',
+    'userauth',
     #'south',
     'materialize',
 

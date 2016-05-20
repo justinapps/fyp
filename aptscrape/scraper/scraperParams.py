@@ -33,6 +33,7 @@ class ListingParams(forms.ModelForm):
         )
     """
     class Meta:
-        fields = ['city', 'minprice', 'maxprice', 'bedrooms']
+        fields = ['city', 'minprice', 'maxprice', 'bedrooms', 'user']
         model = Listing
-
+        #prevent it from being rendered
+        exclude = ('user',)

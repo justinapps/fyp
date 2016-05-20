@@ -49,10 +49,14 @@ def accept_form(request):
     paramD = dict()
     city = ''
     if request.method == 'POST':
-        form = apt_params(data=request.POST)
-        if form.is_valid():
-            form.save()
-            form = ListingParams
+        listing_form = apt_params(data=request.POST)
+        if listing_form.is_valid():
+
+            listing = listing_form.save(commit=False)
+            listing.user = request.user
+            
+            listing.save()
+            listing_form = ListingParams
             city = request.POST.get('city', '').lower()
             paramD = toDictionary(request)
             cgParamD = dict(
@@ -63,13 +67,13 @@ def accept_form(request):
                 )
 
             listings = myhome_crawler(paramD, city)
-            print(listings)
+            #print(listings)
             #cg_crawler(cgParamD, city)
 
 
         else:
             print("Form errors occured in scraper.scrapeViews.py, most likely not a POST method: ")
-            print(form.errors)
+            print(listing_form.errors)
 
             return redirect('/')
 
