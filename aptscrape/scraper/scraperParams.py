@@ -16,22 +16,24 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 from django.utils.html import strip_tags
 from scraper.models import Listing
-
+from scraper.models import CITIES
+'''
 CITIES = (  
     ('Dublin', 'dublin'),
     ('Cavan', 'cavan'),
     ('Kilkenny', 'kilkenny'),
     ('Meath', 'meath'),
 )
+'''
 
 #these params need to be put into a dict for Python's
 #Requests to be able to use them for URL creation
 class ListingParams(forms.ModelForm):
 
-    city = forms.ChoiceField(choices=CITIES, required=True )
+    #city = forms.ChoiceField(widget=forms.Select(choices=CITIES), required=True )
 
 
-    #city = forms.CharField(required=False, widget=forms.widgets.TextInput(attrs={'placeholder': 'City'}))
+    city = forms.CharField(required=False, widget=forms.widgets.TextInput(attrs={'placeholder': 'City'}))
     minprice = forms.IntegerField(required=False, widget=forms.widgets.TextInput(attrs={'placeholder': 'Minimum price'}))
     maxprice = forms.IntegerField(required=False, widget=forms.widgets.TextInput(attrs={'placeholder': 'Maximum price'}))
     bedrooms = forms.IntegerField(

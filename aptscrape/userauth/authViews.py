@@ -35,7 +35,7 @@ def indexViews(request, auth_form=None, user_form=None, search_form=None, listin
 
             #pagination
             
-            paginator = Paginator(listings, 5)
+            paginator = Paginator(listings, 40)
             page = request.GET.get('page')
             try:
                 lists = paginator.page(page)
@@ -102,7 +102,7 @@ def users(request, username=""):
             user = User.objects.get(username=username)
         except User.DoesNotExist:
             raise Http404
-        listings = Listing.objects.filter(user=user.id)
+        listings = Listing.objects.filter(user=user.id).order_by('-id')
         paginator = Paginator(listings, 5)
         page = request.GET.get('page')
         try:

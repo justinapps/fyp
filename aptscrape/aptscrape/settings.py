@@ -11,6 +11,41 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+import djcelery
+djcelery.setup_loader()
+BROKER_URL = 'django://'
+#BROKER_URL = "amqp://myuser:mypassword@localhost:5672//"
+
+"""
+# The backend used to store task results - because we're going to be 
+# using RabbitMQ as a broker, this sends results back as AMQP messages
+CELERY_RESULT_BACKEND = "amqp"
+CELERY_IMPORTS = ("tasks", )
+CELERY_ALWAYS_EAGER = True
+
+BROKER_HOST = "localhost"
+BROKER_PORT = 5672
+BROKER_PASSWORD = "mypassword"
+BROKER_USER = "myuser"
+BROKER_VHOST = "myvhost"
+"""
+import scraper
+
+from celery.schedules import crontab
+
+# The default Django db scheduler
+CELERYBEAT_SCHEDULER = "djcelery.schedulers.DatabaseScheduler"
+CELERYBEAT_SCHEDULE = {
+    "add": {
+        "task": "scraper.tasks.add",
+        # Every Sunday at 4:30AM
+        "schedule": crontab(),
+        "args": (),
+    },
+}
+
+
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -44,6 +79,9 @@ INSTALLED_APPS = [
     'userauth',
     #'south',
     'materialize',
+    'djcelery',
+    'kombu.transport.django',
+    'selenium',
 
     #allauth stuff
     #django sites framework is required

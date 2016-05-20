@@ -10,6 +10,7 @@ from django.http import HttpResponseRedirect
 from .scraperParams import ListingParams
 from django.template.loader import get_template
 from django.template import Context
+from scraper.models import Listing
 
 #need these for registration, login, logout
 #from django.contrib.auth.models import User
@@ -22,6 +23,7 @@ import requests
 from bs4 import BeautifulSoup as bs4
 import numpy as np
 import string
+import re
 
 #Only doing myhome and cg for testing purposes, will implement other
 #websites later.
@@ -66,7 +68,12 @@ def accept_form(request):
                 #is_furnished = furnished,
                 )
 
-            listings = myhome_crawler(paramD, city)
+            #let.ie dict shuld be made here
+
+            myhomelistings = myhome_crawler(paramD, city)
+            letlistings = let_crawler(paramD, city)
+            propertylistings = property_crawler(paramD, city)
+            listings = myhomelistings + letlistings + propertylistings
             #print(listings)
             #cg_crawler(cgParamD, city)
 
@@ -84,6 +91,103 @@ def accept_form(request):
     #paramD = dict()
 
     return listings
+
+def truncate(title):
+    return title[:27] + '...'
+
+
+def let_crawler(paramD, city):
+    list_of_apts = []
+    url_base = 'http://rss.let.ie/property-to-rent/renting_'
+    url = url_base + city + '/' + 'beds_' + str(paramD['maxbeds']) + '/price_' + str(paramD['minprice']) + '-' + str(paramD['maxprice'])
+    resp = requests.get(url, params=None)
+    print(resp.url)
+    html = bs4(resp.text, 'html.parser')
+    apts = html.findAll('item')
+    print('Number of listings on page: ' + str(len(apts)))
+
+    for apt in apts:
+        
+        title = apt.find_all('title')[0].text.title()
+        
+        link = apt.find_all('link')[0].text
+
+        price = apt.find_all('description')[0].text.split('&euro;')[1].split('</b><br/>')[0]
+        n_brs = str(paramD['maxbeds'])
+
+        #price = apt.find_all('price')[0].text.strip('€')
+        #title = apt.find_all('title')[0].text.split(' - ')[0]
+        try:
+            image = apt.find_all('description')[0].text.split('<img src="')[1].split('" border="0">')[0]
+        except:
+            image = 'http://www.kitabiadda.com/book_img/341425Image%20for%20unavailable%20product.jpg'
+
+
+        if len(title) >= 29:
+            truncated = truncate(title)
+        else:
+            truncated = title
+
+        source = 'Let.ie'
+
+        int_price = int(re.sub("[^0-9]", "", price))
+
+        apt_list = [title, link, price, n_brs, image, truncated, source, int_price]
+
+        list_of_apts.append(apt_list)
+
+        list_of_apts.sort(key=lambda x: int(x[7]))
+
+    return list_of_apts
+
+def property_crawler(paramD, city):
+    list_of_apts = []
+    url_base = 'http://rss.property.ie/property-to-let/'
+    url = url_base + city + '/' + 'beds_' + str(paramD['maxbeds']) + '/price_' + str(paramD['minprice']) + '-' + str(paramD['maxprice'])
+    resp = requests.get(url, params=None)
+    print(resp.url)
+    html = bs4(resp.text, 'html.parser')
+    apts = html.findAll('item')
+    print('Number of listings on page: ' + str(len(apts)))
+
+    for apt in apts:
+        
+        title = apt.find_all('title')[0].text.title()
+        
+        link = apt.find_all('link')[0].text
+
+        price = apt.find_all('description')[0].text.split('&euro;')[1].split('</strong>')[0]
+        n_brs = str(paramD['maxbeds'])
+
+        description = apt.find_all('description')[0].text
+
+        #price = apt.find_all('price')[0].text.strip('€')
+        #title = apt.find_all('title')[0].text.split(' - ')[0]
+        try:
+            image = apt.find_all('description')[0].text.split('src="')[1].split('.jpg"')[0] + '.jpg'
+        except:
+            image = '/static/noimage.png'
+
+
+        if len(title) >= 29:
+            truncated = truncate(title)
+        else:
+            truncated = title
+
+        source = 'Property.ie'
+
+        int_price = int(re.sub("[^0-9]", "", price))
+
+        apt_list = [title, link, price, n_brs, image, truncated, source, int_price]
+
+        list_of_apts.append(apt_list)
+
+        list_of_apts.sort(key=lambda x: int(x[7]))
+
+        print(description)
+
+    return list_of_apts
+
 
 
 def myhome_crawler(paramD, city):
@@ -104,26 +208,29 @@ def myhome_crawler(paramD, city):
         print('Number of listings on page: ' + str(len(apts)))
 
         for apt in apts:
-
-            title = apt.find_all('title')[0].text.split(' - ')[0]
+            title = apt.find_all('title')[0].text.split(' - ')[0].title()
             link = apt.find_all('link')[0].text
             price = apt.find_all('price')[0].text.strip('€') #.strip(' / month')
             n_brs = apt.find_all('bedrooms')[0].text.strip(' Bed')
             try:
                 image = apt.find_all('image')[0].text
-            except Exception:
-                return
+            except:
+                image = 'http://www.kitabiadda.com/book_img/341425Image%20for%20unavailable%20product.jpg'
 
             if len(title) >= 29:
-                truncated = title[:27] + '...'
+                truncated = truncate(title)
             else:
                 truncated = title
 
-            print(image)
+            source = 'MyHome.ie'
+
+            int_price = int(re.sub("[^0-9]", "", price))
+
             count = count + 1
-            apt_list = [title, link, price, n_brs, image, truncated]
+            apt_list = [title, link, price, n_brs, image, truncated, source, int_price]
 
             list_of_apts.append(apt_list)
+            list_of_apts.sort(key=lambda x: int(x[7]))
 
             #print( '('+ str(count) +'.) ' + title + '\n' + link + '\n' + price + '\n' + n_brs + '\n')
 
@@ -132,6 +239,7 @@ def myhome_crawler(paramD, city):
 
         print("myhome crawler ran")
         return list_of_apts
+
 
 
 def find_prices(apartments):
@@ -194,3 +302,15 @@ def cg_crawler(cgParamD, city):
 
 
     print("cg crawler ran")
+
+
+#testing
+def add_listing(city, minprice, maxprice, bedrooms, user):
+    l = Listing.objects.get_or_create(user=user)[0]
+    l.city = city
+    l.minprice = minprice
+    l.maxprice = maxprice
+    l.bedrooms = bedrooms
+    l.user = user
+    l.save()
+    return l
