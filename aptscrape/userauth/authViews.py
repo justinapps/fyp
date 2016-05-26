@@ -19,7 +19,6 @@ from scraper.models import Listing
 
 
 def indexViews(request, auth_form=None, user_form=None, search_form=None, listings=None):
-    # User is logged in
     listings =''
     
     if request.user.is_authenticated():
@@ -34,14 +33,11 @@ def indexViews(request, auth_form=None, user_form=None, search_form=None, listin
             return render(request,
                 'tmp.html',
                 {'search_form': search_form, 'user': user, 'listings': listings, 'next_url': '/', })
-
-        #if request method not POST
         else: 
             return render(request,
                 'tmp.html',
                 {'search_form': search_form, 'user': user, 'next_url': '/', })
     else:
-        # User is not logged in
         auth_form = auth_form or AuthenticateForm()
         user_form = user_form or UserCreateForm()
  
@@ -55,10 +51,8 @@ def loginViews(request):
         form = AuthenticateForm(data=request.POST)
         if form.is_valid():
             login(request, form.get_user())
-            # Success
             return redirect('/')
         else:
-            # Failure
             return indexViews(request, auth_form=form)
     return redirect('/')
 
@@ -81,26 +75,17 @@ def registerViews(request):
         else:
             return indexViews(request, user_form=user_form)
     return redirect('/')
-
-
-def get_latest(user):
-    try:
-        return user.ribbit_set.order_by('-id')[0]
-    except IndexError:
-        return ""
  
  
 @login_required
 def users(request, username=""):
     if username:
-        # Show a profile
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
             raise Http404
         listings = Listing.objects.filter(user=user.id)
         if username == request.user.username:
-            # Self Profile or buddies' profile
             return render(request, 'user.html', {'user': user, 'listings': listings, })
         return render(request, 'user.html', {'user': user, 'listings': listings,})
 

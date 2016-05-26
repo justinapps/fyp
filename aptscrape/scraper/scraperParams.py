@@ -21,11 +21,11 @@ from scraper.models import Listing
 #Requests to be able to use them for URL creation
 class ListingParams(forms.ModelForm):
 
-    city = forms.CharField(required=False, label='Location (e.g.: Dublin)')
-    minprice = forms.IntegerField(required=False, label='Minimum price')
-    maxprice = forms.IntegerField(required=False, label='Maximum price')
+    city = forms.CharField(required=False, widget=forms.widgets.TextInput(attrs={'placeholder': 'City'}))
+    minprice = forms.IntegerField(required=False, widget=forms.widgets.TextInput(attrs={'placeholder': 'Minimum price'}))
+    maxprice = forms.IntegerField(required=False, widget=forms.widgets.TextInput(attrs={'placeholder': 'Maximum price'}))
     bedrooms = forms.IntegerField(
-        required=False, label='Bedrooms', min_value=1, max_value=15
+        required=False, widget=forms.widgets.TextInput(attrs={'placeholder': 'Bedrooms'}), min_value=1, max_value=15
         )
     """
     is_furnished = forms.IntegerField(

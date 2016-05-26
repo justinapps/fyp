@@ -109,11 +109,20 @@ def myhome_crawler(paramD, city):
             link = apt.find_all('link')[0].text
             price = apt.find_all('price')[0].text.strip('€') #.strip(' / month')
             n_brs = apt.find_all('bedrooms')[0].text.strip(' Bed')
+            try:
+                image = apt.find_all('image')[0].text
+            except Exception:
+                return
 
+            if len(title) >= 29:
+                truncated = title[:27] + '...'
+            else:
+                truncated = title
+
+            print(image)
             count = count + 1
-            apt_list = [title, link, price, n_brs]
-            #print("Apartment " + str(count) + ":")
-            #print(apt_list)
+            apt_list = [title, link, price, n_brs, image, truncated]
+
             list_of_apts.append(apt_list)
 
             #print( '('+ str(count) +'.) ' + title + '\n' + link + '\n' + price + '\n' + n_brs + '\n')
@@ -121,7 +130,7 @@ def myhome_crawler(paramD, city):
         page_num = page_num + 1
         #print(resp.url)
 
-        print("myhome shit ran")
+        print("myhome crawler ran")
         return list_of_apts
 
 
@@ -140,14 +149,13 @@ def find_prices(apartments):
 
 def cg_crawler(cgParamD, city):
 
-    #while True:
     count = 0
     listing_n = 0
     results = []
 
-    search_indices = np.arange(0, 400, 100)
+    pagination = np.arange(0, 400, 100)
 
-    for i in search_indices:
+    for i in pagination:
 
         url = 'http://' + city + '.craigslist.org/search/apa'
         cgParamD['s'] = str(count*100)
@@ -170,8 +178,6 @@ def cg_crawler(cgParamD, city):
 
 
         size_text = [rw.findAll(attrs={'class': 'housing'})[0].text for rw in apts]
-        #sizes_brs = [find_size_and_brs(stxt) for stxt in size_text]
-        #sizes, n_brs = zip(*sizes_brs)  # This unzips into 2 vectors, (tuples actually)
 
         sizes = [rw.findAll(attrs={'class': 'housing'})[0].text.split(' - ')[1] for rw in apts]
         #print(sizes)
@@ -181,16 +187,10 @@ def cg_crawler(cgParamD, city):
         data = np.array([price, sizes, n_brs, org_title, links])
         col_names = ['price', 'size', 'brs', 'org_title', 'link']
         df = pd.DataFrame(data.T, columns=col_names)
-        #df = df.set_index('time')
 
         results.append(df)
 
     results = pd.concat(results, axis=0)
 
-    use_chars = string.ascii_letters +\
-        ''.join([str(i) for i in range(10)]) +\
-        ' /\.'
-    results['org_title'] = results['org_title'].apply(
-        lambda a: ''.join([i for i in a if i in use_chars]))
 
-    print("cg shit ran")
+    print("cg crawler ran")

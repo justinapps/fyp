@@ -6,12 +6,13 @@
 {% endblock %}
  
 {% block content %}
+    <title> {{ user }}'s search history - Pad Shark </title>
  
     <div class="panel left">
         <h1>{{ user.first_name }}'s searches</h1>
 
         {% for listing in listings %}
-        <div class="ribbitWrapper">
+        <div class="searchWrapper">
 
 
             <p>City: {{ listing.city }}</p>

@@ -20,9 +20,15 @@
 
 
 body {
-	background: white url(gfx/bg.png);
+	background: white;
 	margin: 0;
 	padding: 0;
+}
+
+.card.small{
+	width:400px;
+	margin-left: -50px;
+
 }
 
 input[type="submit"] {
@@ -39,7 +45,7 @@ input[type="submit"] {
 }
 
 .wrapper {
-	height: 433px;
+	height: auto;
 	width: @content-width;
 	margin: auto;
 }
@@ -49,10 +55,7 @@ input[type="submit"] {
 	min-height: 560px;
 	div.wrapper {
 		margin: 38px auto;
-		img {
-			border-radius: 6px;
-			float: left;
-		}
+
 		div.panel {
 			border: 1px solid @border-color;
 			background: white;
@@ -64,48 +67,26 @@ input[type="submit"] {
 				width: 303px;
 				height: 330px;
 				float: right;
-				textarea.ribbitText {
-					width: 249px;
-					height: 160px;
-					border: 1px solid @border-color;
-				}
+
 			}
+			&.rightreg {
+				width: 303px;
+				height: 455px;
+				float: right;
+
+			}
+
+
 			&.left {
-				width: @content-width - 327;
+				width: @content-width - 310;
 				float: left;
-				div.ribbitWrapper {
+				div.searchWrapper {
 					padding: 15px 0;
 					border-bottom: 1px solid @border-color;
 					&:last-child {
 						border: none;
 					}
-					span {
-						&.name {
-							font-size: 18px;
-							color: #58B84E;
-						}
-						&.time {
-							font-size: 12px;
-							color: #CCC;
-						}
-					}
-					img.avatar {
-						margin: 0 19px 0 20px;
-						float: left;
-					}
-					p {
-						margin: 5px 50px 0 90px;
-						padding: 0;
-						text-align: justify;
-						line-height: 1.5;
-						.antialiased(@text-color);
-						span.spacing {
-							padding-left: 9px;
-							margin-left: 9px;
-							height: 10px;
-							border-left: 1px solid @border-color;
-						}
-					}
+
 				}
 			}
 			

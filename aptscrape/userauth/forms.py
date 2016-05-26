@@ -1,15 +1,8 @@
-"""
-Forms for user authentification
-"""
-
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 from django.utils.html import strip_tags
 from scraper.models import Listing
-
-#these params need to be put into a dict for Python's
-#Requests to be able to use them for URL creation
 
 
 
