@@ -22,31 +22,36 @@
         </p>
     </div>
     <div class="container">
-        <ul>
+        {%if lists %}
 
-            {% for apt_list in listings %}
-  <div class="card small">
-    <div class="card-image waves-effect waves-block waves-light">
-      <img class="activator" src=" {{ apt_list.4 }} ">
-    </div>
-    <div class="card-content">
-      <span class="card-title activator grey-text text-darken-4">{{ apt_list.5 }}<i class="material-icons right">more_vert</i></span>
-      <p><a href=" {{ apt_list.1 }} ">View listing.</a></p>
-    </div>
-    <div class="card-reveal">
-      <span class="card-title grey-text text-darken-4">{{ apt_list.0 }}<i class="material-icons right">close</i></span>
-      <p>
-        Price: {{ apt_list.2 }}
-        </br>
-        Bedrooms: {{ apt_list.3 }}
-        </br>
-        <p><a href=" {{ apt_list.1 }} ">Visit original listing</a></p>
-      </p>
-    </div>
-  </div>
+            {% for apt_list in lists %}
+              <div class="card small">
+                <div class="card-image waves-effect waves-block waves-light">
+                  <img class="activator" src=" {{ apt_list.4 }} ">
+                </div>
+                <div class="card-content">
+                  <span class="card-title activator grey-text text-darken-4">{{ apt_list.5 }}<i class="material-icons right">more_vert</i></span>
+                  <p><a href=" {{ apt_list.1 }} ">View listing.</a></p>
+                </div>
+                <div class="card-reveal">
+                  <span class="card-title grey-text text-darken-4">{{ apt_list.0 }}<i class="material-icons right">close</i></span>
+                  <p>
+                    Price: {{ apt_list.2 }}
+                    </br>
+                    Bedrooms: {{ apt_list.3 }}
+                    </br>
+                    <p><a href=" {{ apt_list.1 }} ">Visit original listing</a></p>
+                  </p>
+                </div>
+              </div>
             {% endfor %}
 
-        </ul>
+        {% else %}
+            <p>No matching listings were found.</p>
+
+        {% endif %}
+
+        
 
     </div>
 {% endblock %}

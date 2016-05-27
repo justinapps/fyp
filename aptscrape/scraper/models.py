@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from userauth.models import UserProfile
 
 class Listing(models.Model):
-	city = models.CharField(max_length=58)
+	city = models.CharField(choices=CITIES, max_length=58)
 	minprice = models.IntegerField()
 	maxprice = models.IntegerField()
 	bedrooms = models.IntegerField()

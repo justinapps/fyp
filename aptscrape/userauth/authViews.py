@@ -17,11 +17,15 @@ from django.http import Http404
 
 from scraper.models import Listing
 
+#pagination
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 
 def indexViews(request, auth_form=None, user_form=None, search_form=None, listings=None):
     listings =''
     
     if request.user.is_authenticated():
+        #the user is logged in
         user = request.user
         search_form = ListingParams(data=request.POST)
         
@@ -29,14 +33,28 @@ def indexViews(request, auth_form=None, user_form=None, search_form=None, listin
             
             listings = accept_form(request)
 
+            #pagination
+            
+            paginator = Paginator(listings, 5)
+            page = request.GET.get('page')
+            try:
+                lists = paginator.page(page)
+            except PageNotAnInteger:
+                lists = paginator.page(1)
+            except EmptyPage:
+                lists = paginator.page(paginator.num_pages)
+
 
             return render(request,
                 'tmp.html',
-                {'search_form': search_form, 'user': user, 'listings': listings, 'next_url': '/', })
+                {'search_form': search_form, 'user': user, 'lists': lists, 'next_url': '/', })
         else: 
             return render(request,
                 'tmp.html',
                 {'search_form': search_form, 'user': user, 'next_url': '/', })
+
+
+    #user needs to register or log in
     else:
         auth_form = auth_form or AuthenticateForm()
         user_form = user_form or UserCreateForm()
@@ -85,8 +103,17 @@ def users(request, username=""):
         except User.DoesNotExist:
             raise Http404
         listings = Listing.objects.filter(user=user.id)
+        paginator = Paginator(listings, 5)
+        page = request.GET.get('page')
+        try:
+            searches = paginator.page(page)
+        except PageNotAnInteger:
+            searches = paginator.page(1)
+        except EmptyPage:
+            searches = paginator.page(paginator.num_pages)
+
         if username == request.user.username:
-            return render(request, 'user.html', {'user': user, 'listings': listings, })
-        return render(request, 'user.html', {'user': user, 'listings': listings,})
+            return render(request, 'user.html', {'user': user, 'searches': searches, })
+        return render(request, 'user.html', {'user': user, 'searches': searches,})
 
 

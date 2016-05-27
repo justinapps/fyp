@@ -6,20 +6,38 @@
 {% endblock %}
  
 {% block content %}
-    <title> {{ user }}'s search history - Pad Shark </title>
+    <div class="container">
+        <title> {{ user }}'s search history - Pad Shark </title>
  
-    <div class="panel left">
+
         <h1>{{ user.first_name }}'s searches</h1>
 
-        {% for listing in listings %}
-        <div class="searchWrapper">
+        {% for search in searches %}
 
+            <p>City: {{ search.city }}</p>
+            <p>Minimum price: {{ search.minprice }}</p>
+            <p>Maximum price: {{ search.maxprice }}</p>
+            <p>Bedrooms: {{ search.bedrooms }}</p>
 
-            <p>City: {{ listing.city }}</p>
-            <p>Minimum price: {{ listing.minprice }}</p>
-            <p>Maximum price: {{ listing.maxprice }}</p>
-            <p>Bedrooms: {{ listing.bedrooms }}</p>
-        </div>
+        </br>
+        
         {% endfor %}
+
+
+        <ul class="pagination">
+            {% if searches.has_previous %}
+                <li class="waves-effect"><a href="?page={{ searches.previous_page_number }}"><i class="material-icons">chevron_left</i></a></li>
+            {% endif %}
+
+
+            <li class="waves-effect"><a href="#!">{{ searches.number }}</a></li>
+
+
+            {% if searches.has_next %}
+                <li class="waves-effect"><a href="?page={{ searches.next_page_number }}"><i class="material-icons">chevron_right</i></a></li>
+            {% endif %}
+        </ul>
+
     </div>
 {% endblock %}
+
